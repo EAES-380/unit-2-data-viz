@@ -16,56 +16,82 @@ wat_san <- read_csv("data/water-and-sanitation.csv")
 
 ### Exercise 1
 
-Insert your answer here...then delete this line of text :)
-
+The dataset has `r nrow(wat_san)` rows.
 ### Exercise 2
-
-Insert your answer here...
-
+Every row represents water and sanitation information regarding a specific country for every year. 
+```{r view-data, eval = FALSE}
+View(wat_san)
 ### Exercise 3
-
-Insert your answer here...
-
-```{r no-sanitation-years}
-
+The water unimprovement seems to decrease in the most recent years available, while the water improvement has risen. The implication to take overall is that globally, the quality improved with time!
+```{r}
+ggplot(data = wat_san, mapping = aes(x = sanitation_none)) +
+  geom_histogram(binwidth = 5) +
+  facet_wrap(~Year)
 ```
-
 ### Exercise 4
-
-Insert your answer here...
-
+In the two categories, sanitation_none and water_none are compared. The water_none section is significantly lower in quantity, while the sanitation_none section is much higher across the board. The blunt difference suggests infrastructure is not well aligned. 
 ```{r bottom-5-2000}
-
+wat_san %>%
+  filter(Year == 2000, Entity != "World") %>%
+  slice_max(order_by = sanitation_none, n = 10) %>%
+  select(Entity, sanitation_none, water_none)
 ```
 
 ### Exercise 5
-
-Insert your answer here...
-
-```{r all-2000-plot}
-
+The dots are plotted a bit sporadically, but strongly correlate near the origin.  
+```{r}
+wat_san %>%
+  filter(Year == 2000, Entity != "World") %>%
+  ggplot(aes(x = water_none, y = sanitation_none)) +
+  geom_point()
 ```
+
+
 
 ### Exercise 6
 
-Insert your answer here...
+The sanitation_none gradually decreases down the list of countries, and is a bit lower than excercise 4 data. 
 
 ```{r bottom-5-2020}
+wat_san %>%
+  filter(Year == 2020, Entity != "World") %>%
+  slice_max(order_by = sanitation_none, n = 10) %>%
+  select(Entity, sanitation_none)
 
 ```
 
 ### Exercise 7
-
-Insert your answer here...
+Both means are observed to see improvement over the course of 20 years. 
 
 ```{r progress-summary}
+wat_san %>%
+  filter(Year %in% c(2000, 2020), Entity !="World") %>%
+  group_by(Year) %>%
+  summarize(
+    water_none_min = min(water_none, na.rm = TRUE),
+    water_none_mean = mean(water_none, na.rm = TRUE),
+    water_none_median = median (water_none, na.rm = TRUE),
+    water_none_stdev = sd(water_none, na.rm = TRUE),
+    water_none_iqr = IQR(water_none, na.rm = TRUE),
+    water_none_max = max(water_none, na.rm = TRUE), 
+    
+    sanitation_none_min = min(sanitation_none, na.rm = TRUE), 
+    sanitation_none_mean = mean(sanitation_none, na.rm = TRUE), 
+    sanitation_none_median = median(sanitation_none, na.rm = TRUE),
+    sanitation_none_stdev = sd(sanitation_none, na.rm = TRUE),
+    sanitation_none_iqr = IQR(sanitation_none, na.rm = TRUE),
+    sanitation_none_max = max(sanitation_none, na.rm = TRUE)
+  )
   
 ```
 
 ### Exercise 8
 
-Insert your answer here...
+All countries observed a downward trend but varied in intensity. Chad declined the least steeply, only lowering by approximately 5 points. Ethiopia and India were observed carrying out similar chart trends, at under 20 sanitation_none by 2020. Sudan did not have a linear pathway like the rest of the countries, being consistently straight from 2000-2004 then declining somewehat, followed by consistent data from 2016-2020. Lastly, Nigeria ended under 10 by 2020. The average reveals a general downward trend, indicating slow improvement. 
 
 ```{r country-global-changes}
-
+wat_san %>% 
+  filter(Entity %in% c("World", "India", "Nigeria", "Ethiopia", "Sudan", "Chad")) %>% 
+  ggplot(aes(x = Year, y = sanitation_none, color = Entity)) +
+  geom_line(size = 1.2)
 ```
