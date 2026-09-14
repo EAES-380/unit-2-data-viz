@@ -1,71 +1,160 @@
 ---
-title: "HW 02 - Water and Sanitation - Answer Key"
-author: "Gavin McNicol"
-date: "`r Sys.Date()`"
-output: github_document
+title: "HW 02 - Water and sanitation"
+author: "Insert your name here"
+date: "Insert date here"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
 ---
 
-## Load packages and data
+# Academic integrity and honor code
 
-```{r load-packages-data, message = FALSE}
+By completing and submitting this homework, I certify that:
+
+- I completed the submitted work myself.
+- I did not use generative AI (including ChatGPT, Claude, Gemini, Copilot, Grok, or similar tools) to generate, debug, revise, or interpret code or written answers for this assignment.
+- I may use course materials, lecture notes, R documentation/help files, and other resources explicitly approved by the instructors.
+- I understand that I am responsible for being able to explain all code and written work that I submit.
+
+**Name:** ______________________________  
+**Signature:** ___________________________  
+**Date:** _______________________________
+
+# Before you begin
+
+Work through the exercises using `hw-02-instructions.Rmd` as your guide. Keep **all submitted code in this file**, run your analysis from top to bottom, and Knit frequently.
+
+Before asking for help, check your spelling, parentheses, quotation marks, package loading, and the order in which you ran your chunks. You can ask Dr. Gavin McNicol or TA Kayode Ayegbusi if you are still stuck.
+
+# Load packages and data
+
+```{r load-packages-data, message=FALSE, warning=FALSE}
+# GOAL: Load the tidyverse and the water-and-sanitation data.
 library(tidyverse)
 wat_san <- read_csv("data/water-and-sanitation.csv")
 ```
 
-## Exercises
+# Exercises
 
-### Exercise 1
+## Exercise 1 — How many rows?
 
-Insert your answer here...then delete this line of text :)
+**Goal:** Report the number of observations with inline R code, not a number typed by hand.
 
-### Exercise 2
+**Answer (1 complete sentence):** How many observations (rows) does `wat_san` have?
 
-Insert your answer here...
+> Replace this text with your answer. Use inline R code such as `` `r nrow(wat_san)` `` inside the sentence.
 
-### Exercise 3
+## Exercise 2 — What is a row?
 
-Insert your answer here...
+**Goal:** Identify the observational unit after inspecting the data in the Console with `View(wat_san)`.
 
-```{r no-sanitation-years}
+**Answer (1–2 complete sentences):** What does each row represent?
 
+> Replace this text with your answer.
+
+## Exercise 3 — Open defecation over time
+
+**Goal:** Make a histogram of `sanitation_none` faceted by `Year`.
+
+```{r no-sanitation-years, fig.width=8, fig.height=6}
+ggplot(data = ___, mapping = aes(x = ___)) +
+  geom_histogram(binwidth = ___) +
+  facet_wrap(~___)
 ```
 
-### Exercise 4
+**Interpretation (2–3 complete sentences):** Have rates of open defecation (no sanitation) changed between 2000 and 2020? Which features of the distributions changed?
 
-Insert your answer here...
+> Replace this text with your answer.
+
+## Exercise 4 — Highest “no sanitation” rates in 2000
+
+**Goal:** Filter to 2000 and identify the entities with the highest `sanitation_none` values, in descending order.
 
 ```{r bottom-5-2000}
-
+# Your pipeline here
 ```
 
-### Exercise 5
+**Interpretation (2–3 complete sentences):** Compare `water_none` and `sanitation_none` in that output. Do water and sanitation infrastructure appear tightly associated among these entities?
 
-Insert your answer here...
+> Replace this text with your answer.
 
-```{r all-2000-plot}
+## Exercise 5 — Scatterplot for 2000
 
+**Goal:** Plot `water_none` against `sanitation_none` for the year 2000.
+
+```{r all-2000-plot, fig.width=6, fig.height=4.5}
+# Your pipeline here
 ```
 
-### Exercise 6
+**Interpretation (2–3 complete sentences):** Does this relationship support your Exercise 4 comment? Why or why not?
 
-Insert your answer here...
+> Replace this text with your answer.
+
+## Exercise 6 — Highest “no sanitation” rates in 2020
+
+**Goal:** Repeat the Exercise 4 ranking for 2020 and compare the two lists.
 
 ```{r bottom-5-2020}
-
+# Your pipeline here
 ```
 
-### Exercise 7
+**Interpretation (2–3 complete sentences):** Have the top entities changed between 2000 and 2020? Which were added, and which dropped out?
 
-Insert your answer here...
+> Replace this text with your answer.
+
+## Exercise 7 — Summarize 2000 vs. 2020
+
+**Goal:** After dropping `"World"`, compute min / mean / median / SD / IQR / max of `water_none` and `sanitation_none` by year for 2000 and 2020.
 
 ```{r progress-summary}
-  
+wat_san %>% 
+  filter(Year == ___ & Entity != "World" | Year == ___ & Entity != "World") %>% 
+  group_by(Year) %>% 
+  summarize(
+    water_none_min = min(water_none, na.rm = TRUE),
+    water_none_mean = mean(___, na.rm = TRUE),
+    water_none_median = ___(___, na.rm = TRUE),
+    water_none_stdev = sd(___, na.rm = ___),
+    water_none_iqr = IQR(___, na.rm = ___),
+    water_none_max = ___(___, na.rm = ___),
+    sanitation_none_min = min(sanitation_none, na.rm = TRUE),
+    sanitation_none_mean = mean(sanitation_none, na.rm = TRUE),
+    sanitation_none_median = ___(___, na.rm = TRUE),
+    sanitation_none_stdev = sd(___, na.rm = ___),
+    sanitation_none_iqr = IQR(___, na.rm = ___),
+    sanitation_none_max = ___(___, na.rm = ___)
+  )
 ```
 
-### Exercise 8
+**Interpretation (2–3 complete sentences):** What changed between 2000 and 2020? How do the sanitation summaries compare with the water summaries?
 
-Insert your answer here...
+> Replace this text with your answer.
 
-```{r country-global-changes}
+## Exercise 8 — Time series for selected entities
 
+**Goal:** Plot `sanitation_none` over time for `World`, `India`, and three other entities from your Exercise 4 / 6 lists.
+
+```{r country-global-changes, fig.width=7, fig.height=4.5}
+wat_san %>% 
+  filter(Entity == "World" | Entity == "India" | Entity == "___" | Entity == "___" | Entity == "___") %>% 
+  ggplot(aes(x = ___, y = ___, color = ___)) +
+  geom_line()
 ```
+
+**Interpretation (2–4 complete sentences):** Comment on the rates of change in no sanitation service for at least two of the entities you plotted, and how they compare with the World series.
+
+> Replace this text with your answer.
+
+# Submission checklist
+
+Before submitting, confirm that:
+
+- [ ] I signed the academic-integrity statement.
+- [ ] My name and date are correct in the YAML.
+- [ ] I answered every requested question in complete sentences.
+- [ ] Exercise 1 uses inline R code rather than a typed number.
+- [ ] All required code is in this `.Rmd` file, not only in the Console.
+- [ ] I ran the analysis from top to bottom.
+- [ ] This document Knits without errors.
+- [ ] I committed and pushed my final changes to GitHub.

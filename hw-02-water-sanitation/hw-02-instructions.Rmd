@@ -1,0 +1,337 @@
+---
+title: "HW 02 - Water and sanitation"
+output: 
+  tufte::tufte_html:
+    css: ../hw.css
+    tufte_variant: "envisioned"
+    highlight: pygments
+link-citations: yes
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  eval = FALSE,
+  out.width = "80%",
+  fig.asp = 0.618,
+  fig.width = 6
+)
+```
+
+```{r photo, fig.margin = TRUE, echo = FALSE, fig.width = 3, fig.cap = "Cover of The Last Taboo (2008) by Maggie Black and Ben Fawcett. The book traces why sanitation improvements have often lagged behind gains in drinking-water access.", eval = TRUE}
+knitr::include_graphics("img/black-fawcett-last-tabboo.png")
+```
+
+# Academic integrity and honor code
+
+This homework is designed to help you build fluency with wrangling, summarizing, and visualizing environmental data in R. **Generative AI tools are not permitted for this assignment.** This includes ChatGPT, Claude, Gemini, Copilot, Grok, and similar tools that can generate or revise code, written answers, interpretations, or assignment content.
+
+By completing and submitting this homework, I certify that:
+
+- I completed the submitted work myself.
+- I did not use generative AI to generate, debug, revise, or interpret code or written answers for this assignment.
+- I may use course materials, lecture notes, R documentation/help files, and other resources explicitly approved by the instructors.
+- I understand that I am responsible for being able to explain all code and written work that I submit.
+
+**Name:** ______________________________  
+**Signature:** ___________________________  
+**Date:** _______________________________
+
+> **Important:** Signing this statement is part of the assignment. The same statement appears in your starter file; complete it there as well.
+
+# Homework overview
+
+The COVID-19 pandemic made a familiar public-health instruction suddenly global: wash your hands. Hand washing only works if people have water they can use and somewhere safe to manage human waste. Clean water and sanitation are therefore not only development goals; they are infrastructure that determines whether simple interventions can succeed.
+
+Using a 2020 update published by [Our World in Data](https://ourworldindata.org/water-sanitation-2020-update), we will look at how access to water and sanitation changed around the world between 2000 and 2020. Death and illness from preventable infections remain far more common in places where that infrastructure is missing.
+
+```{marginfigure}
+More background on the indicators and service-level definitions is on the [Our World in Data sanitation page](https://ourworldindata.org/sanitation).
+```
+
+## Learning goals
+
+By the end of this homework, you should be able to:
+
+A. Report a number from data with inline R code rather than typing the digit by hand.
+B. Filter, arrange, and summarize rows with `dplyr`.
+C. Build faceted histograms and scatterplots in `ggplot2`.
+D. Compare water and sanitation access across countries and years.
+E. Make a simple time-series plot and interpret rates of change.
+
+## Deliverable
+
+Complete **`hw-02-starter.Rmd`**. Your finished starter file should contain your code, plots, and written responses and should Knit successfully from top to bottom.
+
+**The instructions file tells you what to do; the starter file is where your assignment work belongs, except for completing the honor-code signature above.**
+
+## Reproducibility rule
+
+Throughout EAES 380, your analysis should work **from top to bottom**. Code that works only because you previously ran something in the Console is not reproducible.
+
+**Knit frequently.** Knitting is one of the best ways to discover whether your document actually contains everything needed to reproduce your work.
+
+## Before asking for help
+
+First check:
+
+- Did you run the relevant chunks from top to bottom?
+- Did you spell every object and variable name exactly as shown? R is case-sensitive.
+- Are all parentheses, quotation marks, and backticks closed?
+- Did you load the packages needed by your code?
+- Does the error message point to a particular chunk or line?
+- Have you tried Knitting the document to identify where the problem first occurs?
+
+If you still cannot resolve the problem, ask Dr. Gavin McNicol or TA Kayode Ayegbusi and show them the code and error message.
+
+# Getting started
+
+Each assignment begins with a similar workflow.
+
+**If you are reading a Knitted version of these instructions, you may already have completed these steps. Treat them as review.**
+
+## Create your copy of the course repository
+
+- Open the GitHub repository you want to copy (for example, `unit-1`).
+- Add `/generate` to the end of the repository URL and press Return/Enter.
+- Under **Owner**, choose `EAES-380`. **Do not choose your personal account.**
+- Under **Repository name**, enter `unit-X-yourlastname`.
+    - For example: `unit-1-mcnicol`.
+- You can leave **Description** blank.
+- Confirm that the repository is **Private**.
+- Click **Create repository**.
+
+## Create your RStudio Cloud project
+
+- Copy the URL of your generated repository using the green **Code** button on GitHub.
+- Clone it into a **New Project from a GitHub Repo** in [RStudio Cloud](https://rstudio.cloud).
+- Use the **Files** pane to navigate to the homework folder.
+- Open `hw-02-instructions.Rmd` and Knit it.
+- Open `hw-02-starter.Rmd`. **This is the file you will complete.**
+
+# Warm-up: R Markdown + Git
+
+Open `hw-02-starter.Rmd`.
+
+A. Replace `Insert your name here` with your name.
+B. Replace `Insert date here` with today's date.
+C. Complete and sign the honor-code statement.
+D. Knit the document.
+
+Then commit with a message such as `Update author and honor code`, push to GitHub, and confirm that the updated `.Rmd` file is visible in your repository.
+
+# Packages and data
+
+We will use the **tidyverse** for wrangling and visualization. The package is already installed. Load it, then read the data from the `data` folder of your repository.
+
+```{r load-packages-data-demo, message = FALSE}
+library(tidyverse)
+wat_san <- read_csv("data/water-and-sanitation.csv")
+```
+
+## Viewing the data
+
+You can inspect the data frame as a spreadsheet with `View(wat_san)`. Type that command in the **Console**, not in your R Markdown file. `View()` opens an interactive window, which does not belong in a static knitted document.
+
+This is a custom course dataset, so `?wat_san` will not open a help file. Use the variable list below instead.
+
+Each column is a variable. You can print the names with:
+
+```{r names-demo}
+names(wat_san)
+```
+
+- `Entity`: Country name, or a regional / income-group aggregate, or `World`
+- `Year`: Year of the estimate
+- `water_*`: Percent of the population at a given water-service level
+- `sanitation_*`: Percent of the population at a given sanitation-service level
+
+Suffixes added to `water_` or `sanitation_`:
+
+- `_improved`: Improved access (safely managed, basic, or limited)
+- `_safe`: Safely managed (for sanitation: a private, hygienic toilet whose waste is treated)
+- `_basic`: Basic improved service
+- `_limited`: Limited improved service (for sanitation: a shared toilet)
+- `_unimproved`: Unimproved facility (for sanitation: often a poorly maintained pit latrine)
+- `_none`: No service (for sanitation: open defecation; for water: no improved source)
+
+# Exercises
+
+For each exercise:
+
+A. Read the prompt here.
+B. Complete the corresponding section in `hw-02-starter.Rmd`.
+C. Run your code and inspect the output.
+D. Write any requested interpretation in complete sentences.
+E. Knit before moving on when a checkpoint is indicated.
+
+```{marginfigure}
+**Hint:** The Markdown Quick Reference (Help menu in RStudio) shows the syntax for inline R code: a single backtick, then `r`, then the expression, then a closing backtick.
+```
+
+## Exercise 1 — How many rows?
+
+**Goal:** Report a fact from the data with inline R code.
+
+How many observations (rows) does the dataset have?
+
+Do not type the number by hand. Use inline R code inside your narrative sentence so that the number is generated when you Knit.
+
+## Exercise 2 — What is a row?
+
+**Goal:** Identify the observational unit.
+
+Run `View(wat_san)` in the Console. What does each row in the dataset represent?
+
+### Exercise 2 checkpoint
+
+🧶 ✅ ⬆️ **Knit, commit, and push.** Suggested commit message: `Complete Exercises 1 and 2`.
+
+--
+
+## Exercise 3 — Open defecation over time
+
+**Goal:** Compare a numerical distribution across years with a faceted histogram.
+
+Create a faceted histogram in which each facet is a year and the plotted variable is the percent of the population with **no sanitation service** (`sanitation_none`).
+
+- Does it look as if rates of open defecation have changed between 2000 and 2020?
+- What features of the distributions have changed over time, if any?
+
+A skeleton is already in your starter file. Fill in the blanks.
+
+```{r no-sanitation-years-demo, echo = TRUE}
+ggplot(data = ___, mapping = aes(x = ___)) +
+  geom_histogram(binwidth = ___) +
+  facet_wrap(~___)
+```
+
+How to read that skeleton:
+
+- `ggplot()` starts the plot.
+- The first layer names the data frame and maps variables to **aes**thetics (here, the x-axis).
+- `geom_histogram()` displays the distribution. Try a few bin widths and keep one that makes the year-to-year comparison readable.
+- `facet_wrap()` splits the plot into panels. Facet by **year**, not by entity.
+
+### Exercise 3 checkpoint
+
+🧶 ✅ ⬆️ **Knit, commit, and push.** Suggested commit message: `Complete Exercise 3`.
+
+## Exercise 4 — Highest “no sanitation” rates in 2000
+
+**Goal:** Filter a year, then sort or slice to find the most extreme countries.
+
+In a single pipeline, identify the entities with the highest rates of no sanitation service in **2000** and arrange them in descending order.
+
+```{marginfigure}
+**Hint:** `slice_max()` from week 1 is a compact way to keep the largest values of a variable. Run `?slice_max` if you need the arguments.
+```
+
+A pipeline shaped like `data %>% filter() %>% arrange()` or `data %>% filter() %>% slice_max()` is enough. Looking at five to ten rows is plenty.
+
+- Compare the `water_none` and `sanitation_none` columns in the output.
+- Do water and sanitation infrastructure appear tightly associated in these rows, or not?
+
+## Exercise 5 — Scatterplot for 2000
+
+**Goal:** Check the Exercise 4 claim with a plot of every entity in 2000.
+
+Filter the data to the year 2000 and draw a scatterplot of `water_none` versus `sanitation_none`.
+
+- Does the plot support your Exercise 4 comment about association? Why or why not?
+
+## Exercise 6 — Highest “no sanitation” rates in 2020
+
+**Goal:** Repeat the 2000 ranking for 2020 and compare the two lists.
+
+Identify the entities with the highest rates of no sanitation service in **2020**, arranged in descending order.
+
+- Have the entities in the top of the list changed since 2000?
+- Which have been added, and which have dropped out?
+
+### Exercise 6 checkpoint
+
+🧶 ✅ ⬆️ **Knit, commit, and push.** Suggested commit message: `Complete Exercises 4–6`.
+
+--
+
+Exercises 7 and 8 take a little more assembly. Starter skeletons are already in `hw-02-starter.Rmd`. Fill them in, then write a short narrative answer under each plot or table.
+
+## Exercise 7 — Summarize 2000 vs. 2020
+
+**Goal:** Use `group_by()` and `summarize()` to compare the distribution of `water_none` and `sanitation_none` in two years.
+
+Calculate the minimum, mean, median, standard deviation, IQR, and maximum of `water_none` and `sanitation_none` in **2000** and **2020**.
+
+- Filter to those two years and drop the `Entity` value `"World"` so that the World aggregate is not mixed into the country-level summaries. Regional aggregates may still be present; that is acceptable.
+- What do you notice about the values between 2000 and 2020?
+- What do you notice when you compare the sanitation summaries with the water summaries?
+
+```{marginfigure}
+The filter line combines `==`, `!=`, `&`, and `|`. Because `&` is evaluated before `|`, the provided pattern keeps 2000-not-World **or** 2020-not-World. `Year %in% c(2000, 2020) & Entity != "World"` does the same job in one condition if you prefer it.
+```
+
+```{r progress-summary-demo, echo = TRUE}
+wat_san %>% 
+  filter(Year == ___ & Entity != "World" | Year == ___ & Entity != "World") %>% 
+  group_by(Year) %>% 
+  summarize(
+    water_none_min = min(water_none, na.rm = TRUE),
+    water_none_mean = mean(___, na.rm = TRUE),
+    water_none_median = ___(___, na.rm = TRUE),
+    water_none_stdev = sd(___, na.rm = ___),
+    water_none_iqr = IQR(___, na.rm = ___),
+    water_none_max = ___(___, na.rm = ___),
+    sanitation_none_min = min(sanitation_none, na.rm = TRUE),
+    sanitation_none_mean = mean(sanitation_none, na.rm = TRUE),
+    sanitation_none_median = ___(___, na.rm = TRUE),
+    sanitation_none_stdev = sd(___, na.rm = ___),
+    sanitation_none_iqr = IQR(___, na.rm = ___),
+    sanitation_none_max = ___(___, na.rm = ___)
+  )
+```
+
+### Exercise 7 checkpoint
+
+🧶 ✅ ⬆️ **Knit, commit, and push.** Suggested commit message: `Complete Exercise 7`.
+
+## Exercise 8 — Time series for selected entities
+
+**Goal:** Explain the Exercise 6 turnover with a time-series plot.
+
+Create a time-series visualization that helps you understand why the entities with the highest rates of no sanitation changed between 2000 and 2020.
+
+- Include the entity `"World"` so that you can compare country trajectories with the global series.
+- Map `Entity` to an aesthetic so that the series can be told apart.
+- Try more than one `geom_` if you like (`geom_line()` is the usual starting point; points on top of lines can help).
+- Comment on the rates of change in no sanitation service for at least two of the entities you plotted.
+
+A time-series plot shows how a variable changes across years.
+
+Choose **World**, **India** (already in the skeleton), and three other entities from your Exercise 4 and Exercise 6 lists. A useful mix is one entity that improved enough to leave the 2000 top five and one that was still near the top in 2020.
+
+```{r country-global-changes-demo, echo = TRUE}
+wat_san %>% 
+  filter(Entity == "World" | Entity == "India" | Entity == "___" | Entity == "___" | Entity == "___") %>% 
+  ggplot(aes(x = ___, y = ___, color = ___)) +
+  geom_line()
+```
+
+### Exercise 8 checkpoint
+
+🧶 ✅ ⬆️ Knit, commit, and push with a message such as `Complete HW 2`. Commit **all** changed files so the Git pane is clear, then check GitHub to confirm you are happy with the final state of the work.
+
+# Submission checklist
+
+Before you finish, confirm that:
+
+- [ ] I signed the academic-integrity statement in both the instructions and starter files.
+- [ ] My name and date are correct in the starter-file YAML.
+- [ ] I answered every requested question in complete sentences.
+- [ ] Exercise 1 uses inline R code rather than a typed number.
+- [ ] All required code is contained in the starter `.Rmd` file, not only in the Console.
+- [ ] I ran the analysis from top to bottom.
+- [ ] `hw-02-starter.Rmd` Knits without errors.
+- [ ] I committed and pushed all final changes to GitHub.
+- [ ] My Git pane is clear and the latest files are visible in my GitHub repository.
+
+🧶 ✅ ⬆️ **Final step:** Knit, commit remaining changes with a message such as `Complete HW 2`, and push them to GitHub.
