@@ -1,80 +1,166 @@
 ---
-title: "Lab 02 - Plastic waste"
+title: "Lab 02 - Global plastic waste"
 author: "Insert your name here"
 date: "Insert date here"
-output: github_document
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
 ---
 
-## Load packages and data
+# Academic integrity and honor code
 
-```{r load-packages, message=FALSE}
-library(tidyverse) 
+By completing and submitting this lab, I certify that:
+
+- I completed the submitted work myself.
+- I did not use generative AI (including ChatGPT, Claude, Gemini, Copilot, Grok, or similar tools) to generate, debug, revise, or interpret code or written answers for this assignment.
+- I may use course materials, lecture notes, R documentation/help files, and other resources explicitly approved by the instructors.
+- I understand that I am responsible for being able to explain all code and written work that I submit.
+
+**Name:** ______________________________  
+**Signature:** ___________________________  
+**Date:** _______________________________
+
+# Before you begin
+
+Work through the exercises using `lab-02-instructions.Rmd` as your guide. Keep **all submitted code in this file**, run your analysis from top to bottom, and Knit frequently.
+
+Before asking for help, check your spelling, parentheses, quotation marks, package loading, and the order in which you ran your chunks.
+
+# Load packages and data
+
+```{r load-packages, message=FALSE, warning=FALSE}
+# GOAL: Load the tidyverse package used in this lab.
+library(tidyverse)
 ```
 
 ```{r load-data, message=FALSE}
+# GOAL: Read the 2010 country-level plastic-waste data.
 plastic_waste <- read_csv("data/plastic-waste.csv")
 ```
 
-## Exercises
+# Warm-up
 
-### Exercise 1
+**Answer in complete sentences:**
 
-Remove this text, and add your answer for Exercise 1 here.
+1. RStudio is divided into four panes. Name each pane and briefly describe its purpose.
+2. How many observations (rows) are in `plastic_waste` after you load it?
+3. Some cells in the data take the value `NA`. What does `NA` mean?
 
-```{r plastic-waste-continent}
-# insert code here
+> Replace this text with your answer.
+
+# Exercises
+
+## Exercise 1 — Faceted histograms by continent
+
+**Goal:** Compare the distribution of plastic waste per capita across continents.
+
+Plot histograms of `plastic_waste_per_cap` faceted by `continent`.
+
+```{r plastic-waste-continent, fig.width=8, fig.height=6}
+# Your code here
 ```
 
-### Exercise 2
+**Interpretation (2–3 complete sentences):** What can you say about how the continents compare to each other in terms of plastic waste per capita?
 
-```{r plastic-waste-density}
-# insert code here
+> Replace this text with your answer.
+
+## Exercise 2 — Density plots with a better alpha
+
+**Goal:** Recreate the filled, continent-colored density plot using an alpha value lower than 0.7 so overlapping curves stay readable.
+
+```{r plastic-waste-density, fig.width=7, fig.height=4.5}
+# Your code here
 ```
 
-### Exercise 3
+**Note (optional):** Record the alpha value you chose and why you preferred it over 0.7.
 
-Remove this text, and add your answer for Exercise 3 here.
+> Replace this text with a brief note if you want to explain your alpha choice. You may delete this line if you prefer.
 
-### Exercise 4
+## Exercise 3 — Mapped aesthetics vs. geom arguments
 
-Remove this text, and add your answer for Exercise 4 here.
+**Goal:** Explain a `ggplot2` design choice.
 
-```{r plastic-waste-violin}
-# insert code here
+**Interpretation (1–2 complete sentences):** Why did we define the `color` and `fill` of the curves by mapping aesthetics of the plot, but define the `alpha` level as a characteristic of the plotting geom?
+
+> Replace this text with your answer.
+
+## Exercise 4 — Violin plots
+
+**Goal:** Convert the side-by-side box plots of plastic waste per capita by continent into violin plots, then compare what each geom shows.
+
+```{r plastic-waste-violin, fig.width=7, fig.height=4.5}
+# Your code here
 ```
 
-### Exercise 5
+**Interpretation (2–3 complete sentences):**
 
-Remove this text, and add your answer for Exercise 5 here.
+- What do the violin plots reveal that the box plots do not?
+- What features are apparent in the box plots but not in the violin plots?
 
-```{r plastic-waste-mismanaged}
-# insert code here
+> Replace this text with your answer.
+
+## Exercise 5 — Plastic waste vs. mismanaged waste
+
+**Goal:** Visualize the relationship between plastic waste per capita and mismanaged plastic waste per capita.
+
+```{r plastic-waste-mismanaged, fig.width=6, fig.height=4.5}
+# Your code here
 ```
 
-### Exercise 6
+**Interpretation (2–3 complete sentences):** Describe the relationship.
 
-Remove this text, and add your answer for Exercise 6 here.
+> Replace this text with your answer.
 
-```{r plastic-waste-mismanaged-continent}
-# insert code here
+## Exercise 6 — Color points by continent
+
+**Goal:** Check whether the association in Exercise 5 looks the same across continents.
+
+```{r plastic-waste-mismanaged-continent, fig.width=7, fig.height=4.5}
+# Your code here
 ```
 
-### Exercise 7
+**Interpretation (2–3 complete sentences):** Does there seem to be any clear distinction among continents in how plastic waste per capita and mismanaged plastic waste per capita are associated?
 
-Remove this text, and add your answer for Exercise 7 here.
+> Replace this text with your answer.
 
-```{r plastic-waste-population-total}
-# insert code here
+## Exercise 7 — Waste vs. population size
+
+**Goal:** Compare plastic waste per capita with total population and with coastal population using two separate scatterplots.
+
+```{r plastic-waste-population-total, fig.width=6, fig.height=4.5}
+# Your code here
 ```
 
-```{r plastic-waste-population-coastal}
-# insert code here
+```{r plastic-waste-population-coastal, fig.width=6, fig.height=4.5}
+# Your code here
 ```
 
-### Exercise 8
+**Interpretation (2–3 complete sentences):** Do either of these pairs of variables appear to be more strongly linearly associated?
 
-Remove this text, and add your answer for Exercise 8 here.
+> Replace this text with your answer.
 
-```{r recreate-viz}
-# insert code here
+## Exercise 8 — Recreate and interpret a plot
+
+**Goal:** Recreate the target plot from the instructions and interpret it in context.
+
+```{r recreate-viz, fig.width=7, fig.height=4.5, message=FALSE, warning=FALSE}
+# Your code here
 ```
+
+**Interpretation (2–4 complete sentences):** What does the plot show about the relationship between coastal population proportion and plastic waste per capita? Mention the overall pattern, the smooth curve, and what the pattern suggests in context.
+
+> Replace this text with your answer.
+
+# Submission checklist
+
+Before submitting, confirm that:
+
+- [ ] I signed the academic-integrity statement.
+- [ ] My name and date are correct in the YAML.
+- [ ] I answered every requested question in complete sentences.
+- [ ] All required code is in this `.Rmd` file, not only in the Console.
+- [ ] I ran the analysis from top to bottom.
+- [ ] My plots and numerical outputs appear as expected.
+- [ ] This document Knits without errors.
+- [ ] I committed and pushed my final changes to GitHub.
